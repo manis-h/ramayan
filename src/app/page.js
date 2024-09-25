@@ -6,12 +6,16 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const [form, setForm] = useState({});
   const [pay, setPay] = useState(false);
-
+const [ss,setSS]= useState()
   const submitForm = (e) => {
     e.preventDefault();
     setPay(true);
   };
   const sendForm=async(e)=>{
+    const formData =new FormData()
+formData.append('user',form)
+
+
     e.preventDefault()
     const data = await axios.post("/api/postticketinfo",{
       user:{...form}
@@ -157,7 +161,7 @@ export default function Home() {
               placeholder=" "
               required
               // value={form?.email || ""}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              onChange={(e) => setSS(e.target.files[0])}
             />
             <label
               for="floating_email"
@@ -175,7 +179,7 @@ export default function Home() {
               placeholder=" "
               required
               // value={form?.email || ""}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              onChange={(e) => setForm({ ...form, utr: e.target.value })}
             />
             <label
               for="floating_email"
