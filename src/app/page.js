@@ -15,11 +15,12 @@ const [ss,setSS]= useState()
     const formData =new FormData()
 formData.append('user',form)
 
+formData.append('screenshot',ss)
 
     e.preventDefault()
-    const data = await axios.post("/api/postticketinfo",{
-      user:{...form}
-    })
+    const data = await axios.post("/api/uploads",
+      formData
+    )
     console.log(data)
   }
   return (
