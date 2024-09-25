@@ -8,7 +8,7 @@ export default async (req, res) => {
     dbConnect()
     // fetch the user form the frontend
     const { user, ticketInfo } = req.body;
-
+console.log(req.body)
     if (!user && !ticketInfo) {
       return res.status(400).json({
         message: "Missing user and ticket info",
