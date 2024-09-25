@@ -75,8 +75,8 @@ import nextConnect from 'next-connect';
 // Initialize AWS S3
 // Initialize AWS S3
 const s3 = new aws.S3({
-  accessKeyId:"AKIAQ3EGUBYBZD6YKHWZ",
-  secretAccessKey: "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",
+  accessKeyId:process.env.accessKeyId,
+  secretAccessKey: process.env.secretAccessKey,
   region: 'ap-south-1',
 });
 
