@@ -1,11 +1,12 @@
-// lib/mongoose.js
 import mongoose from 'mongoose';
 
-// const MONGODB_URI = `mongodb+srv://manish:OnlyoneLoan%40007@cluster0.vxzgi.mongodb.net/RamLeela?retryWrites=true&w=majority&appName=Cluster0`;
+// Hardcoded MongoDB URI
+const MONGODB_URI = `mongodb+srv://manish:OnlyoneLoan%40007@cluster0.vxzgi.mongodb.net/RamLeela?retryWrites=true&w=majority&appName=Cluster0`;
 
-// if (!MONGODB_URI) {
-//   throw new Error('Please add your Mongo URI to .env.local');
-// }
+// Check if URI is provided
+if (!MONGODB_URI) {
+  throw new Error('MongoDB URI is missing!');
+}
 
 let cached = global.mongoose;
 
@@ -24,7 +25,7 @@ async function dbConnect() {
       useUnifiedTopology: true,
     };
 
-    cached.promise = mongoose.connect(process.env.MONGODB_URI, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
       return mongoose;
     });
   }

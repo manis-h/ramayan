@@ -4,9 +4,9 @@ import Ticket from '@/models/TicketInfo';
 
 // Initialize AWS S3
 const s3 = new aws.S3({
-  accessKeyId: "AKIAQ3EGUBYBZD6YKHWZ",
-  secretAccessKey: "waEiCGsYqdLHoCDZg82z3IbZPMKg6GayuOMo3VXr",
-  region: 'ap-south-1',
+  accessKeyId: "AKIAQ3EGUBYBZD6YKHWZ", // Replace with your actual access key
+  secretAccessKey: "waEiCGsYqdLHoCDZg82z3IbZPMKg6GayuOMo3VXr", // Replace with your actual secret key
+  region: 'ap-south-1', // Your AWS region
 });
 
 // Configure multer for handling multipart form data
@@ -57,35 +57,14 @@ export default async function handler(req, res) {
         const screenshotUrl = await uploadFileToS3(file);
         console.log('Screenshot URL:', screenshotUrl);
 
-        // Access user data from form fields
-        const { user } = req.body; // Access user data from form data
-
-        // Parse user if it's a stringified JSON object
-        let userData;
-        try {
-          userData = typeof user === 'string' ? JSON.parse(user) : user;
-        } catch (parseError) {
-          return res.status(400).json({ error: 'Invalid user data' });
-        }
-
-        console.log('User data:', userData); // Check the parsed user data
-
-        if (!userData) {
-          return res.status(400).json({ error: 'No user data provided' });
-        }
-
-        console.log("The user data is ")
-
-        // Save the ticket in the database
+        // Save the ticket with only screenshot URL in the database
         const createdTicket = new Ticket({
-          user: {"userData"  : userData}, // userData is now an object
-          ticketInfo: {  "screenshot_Url" : screenshotUrl },
+          ticketInfo: { "screenshot_Url": screenshotUrl },
         });
 
-        console.log("The created Ticket is ",createdTicket);
-  createdTicket.save()
-        // const savedTicket = await createdTicket.save();
-console.log("model")
+        await createdTicket.save(); // Save ticket to MongoDB
+        console.log('Ticket saved:', createdTicket);
+
         return res.status(200).json({
           success: true,
           screenshotUrl,
