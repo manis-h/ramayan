@@ -7,18 +7,17 @@ export default async (req, res) => {
 
     dbConnect()
     // fetch the user form the frontend
-    const { user, ticketInfo } = req.body;
-console.log(req.body)
-    if (!user && !ticketInfo) {
+    const { user } = req.body;
+    console.log(req.body)
+    if (!user ) {
       return res.status(400).json({
-        message: "Missing user and ticket info",
+        message: "Missing user ",
       });
     }
 
     // now save the user in the database Ticket
     const createdUser = new Ticket({
       user,
-      ticketInfo,
     });
 
     await createdUser.save(); // Use save() instead of bulkSave()

@@ -30,7 +30,7 @@ export default async function getAllUsers(req, res) {
     }
     
   } catch (error) {
-    console.error(error);
+    console.error(error.message);
     return res.status(500).json({
       success: false,
       message: "Error while getting the user info",
