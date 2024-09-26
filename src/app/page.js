@@ -2,31 +2,48 @@
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
 // import Er from ''
 export default function Home() {
   const [form, setForm] = useState({});
   const [pay, setPay] = useState(false);
-const [ss,setSS]= useState()
-  const submitForm = (e) => {
+  const [ss, setSS] = useState({});
+  const sendPhoto = async (e) => {
     e.preventDefault();
-    setPay(true);
+    
+    const formData = new FormData();
+    
+    formData.append('screenshot',ss?.photo)
+    const data = await axios.post(`/api/uploads?userId=${ss?.id}&utr=${ss?.utr}`,formData);
+    if (data?.data?.success) {
+      Swal.fire({
+        success:true,
+        icon:'success',
+        text:'Form Submitted Successfully'
+      })
+      setPay(false)
+    }
   };
-  const sendForm=async(e)=>{
-    const formData =new FormData()
-formData.append('user',form)
+  const submitForm = async (e) => {
+    const formData = new FormData();
+    // formData.append('user',form)
 
+    formData.append('screenshot',ss)
 
-    e.preventDefault()
-    const data = await axios.post("/api/postticketinfo",{
-      user:{...form}
-    })
-    console.log(data)
-  }
+    e.preventDefault();
+    const data = await axios.post("/api/postticketinfo", { user: form });
+    if (data?.data?.success) {
+      setPay(true);
+      setSS({...ss,id:data?.data?.data?._id})
+    }
+    console.log({ data });
+    console.log(data?.data?.data?._id);
+  };
   return (
     <div className="mx-auto vh-100 h-full my-auto content-center bg-ram">
       <h1 className="max-w-md mx-auto font-extrabold text-5xl text-center p-2 text-amber-800">
         लव कुश रामायण
-      </h1>   
+      </h1>
       {!pay ? (
         <form
           class="max-w-md mx-auto p-4 rounded-md	bg-slate-100 opacity-90 	"
@@ -161,7 +178,7 @@ formData.append('user',form)
               placeholder=" "
               required
               // value={form?.email || ""}
-              onChange={(e) => setSS(e.target.files[0])}
+              onChange={(e) => setSS({...ss,photo:e.target.files[0]})}
             />
             <label
               for="floating_email"
@@ -179,7 +196,7 @@ formData.append('user',form)
               placeholder=" "
               required
               // value={form?.email || ""}
-              onChange={(e) => setForm({ ...form, utr: e.target.value })}
+              onChange={(e) => setSS({ ...ss, utr: e.target.value })}
             />
             <label
               for="floating_email"
@@ -188,7 +205,10 @@ formData.append('user',form)
               UTR number of Payment
             </label>
           </div>
-          <button onClick={sendForm} class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+          <button
+            onClick={sendPhoto}
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
             Submit
           </button>
         </form>
