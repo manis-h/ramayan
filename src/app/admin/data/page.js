@@ -15,15 +15,18 @@ export default function DataPage() {
   // State to track if the checkbox is checked
   const [isApproved, setIsApproved] = useState(false);
 
+  // Fetch the user 
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/getusers');
+      setUsers(response.data.userinfo);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/api/getusers');
-        setUsers(response.data.userinfo);
-      } catch (error) {
-        console.error('Error fetching users:', error);
-      }
-    };
+    
     fetchUsers();
   }, []);
 
@@ -56,12 +59,15 @@ export default function DataPage() {
       headerName: "Verify User",
       width: 200,
       renderCell: (params) => (
+      
         <>
-          {approvedStatus[params.row._id] ? (
-            <CheckBoxIcon style={{ color: "green", cursor: "pointer" }} />
-          ) : (
-            <CancelIcon style={{ color: "red", cursor: "pointer" }} />
-          )}
+         <>
+      {params.row.ticketInfo?.status ? (
+        <CheckBoxIcon style={{ color: "green", cursor: "pointer" }} />
+      ) : (
+        <CancelIcon style={{ color: "red", cursor: "pointer" }} />
+      )}
+    </>
         </>
       ),
     },
@@ -75,7 +81,9 @@ export default function DataPage() {
     emailadress: user.user.email,
     address: user.user.address,
     pnno: user.user.Mobile,
-    ticketInfo: user.ticketInfo, // Add this to access ticket info in the modal
+    ticketInfo: user.ticketInfo, // Add this to 
+    // access ticket info in the modal
+    verifyUser : user.ticketInfo.status
   })) : [];
 
   const handleOpenModal = (user) => {
@@ -112,6 +120,8 @@ export default function DataPage() {
 
         // Optionally close the modal after submission
         handleCloseModal();
+
+        await fetchUsers();
       } catch (error) {
         console.error("Error submitting approval:", error);
       }
