@@ -81,7 +81,7 @@ export default async (req, res) => {
 
       // Send email
       console.log("The mail is ",user.user.email,user.user.fName)
-      await sendmail(user.user.email, user.user.name, "1234556");
+      await sendmail(user.user.email, user.user.fName, user.ticketInfo.utrno);
 
       return res.status(201).json({
         success: true,
