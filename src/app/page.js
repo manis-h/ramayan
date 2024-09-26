@@ -14,7 +14,7 @@ export default function Home() {
     const formData = new FormData();
     
     formData.append('screenshot',ss?.photo)
-    const data = await axios.post(`/api/uploads?id=${ss?.id}&utr=${ss?.utr}`,formData);
+    const data = await axios.post(`/api/uploads?userId=${ss?.id}&utr=${ss?.utr}`,formData);
     if (data?.data?.success) {
       Swal.fire({
         success:true,
