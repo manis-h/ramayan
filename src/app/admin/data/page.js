@@ -12,6 +12,8 @@ export default function DataPage() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [approvedStatus, setApprovedStatus] = useState({});
+  // State to track if the checkbox is checked
+  const [isApproved, setIsApproved] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -87,6 +89,7 @@ export default function DataPage() {
   };
 
   const handleSubmitApproval = async () => {
+    console.log("The selected User is ",selectedUser);
     if (selectedUser) {
       try {
         // Console the ID for debugging
@@ -115,12 +118,67 @@ export default function DataPage() {
     }
   };
 
+  const handleCheckboxChange = (e) => {
+    setIsApproved(e.target.checked);
+  };
+
   return (
     <div>
-      <nav className="bg-blue-600">
-        {/* Navigation code omitted for brevity */}
-      </nav>
+            <nav className="bg-blue-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <Link href="/">
+                <span className="text-white font-bold text-xl">Admin Dashboard</span>
+              </Link>
+            </div>
+            <div className="-mr-2 flex md:hidden">
+              <button
+                onClick={toggleMenu}
+                type="button"
+                className="bg-blue-700 inline-flex items-center justify-center p-2 rounded-md text-white hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-800 focus:ring-white"
+                aria-controls="mobile-menu"
+                aria-expanded={isOpen}
+              >
+                <span className="sr-only">Open main menu</span>
+                {isOpen ? (
+                  <svg
+                    className="block h-6 w-6"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg
+                    className="block h-6 w-6"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
 
+        {isOpen && (
+          <div className="md:hidden" id="mobile-menu">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              <Link href="/">
+                <span className="text-white hover:bg-blue-500 block px-3 py-2 rounded-md text-base font-medium">Home</span>
+              </Link>
+            </div>
+          </div>
+        )}
+      </nav>
       <div style={{ height: 400, width: "100%", marginTop: "20px" }}>
         <DataGrid rows={rows} columns={columns} pageSize={5} />
       </div>
@@ -140,7 +198,7 @@ export default function DataPage() {
           borderRadius: '8px',
           boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
           maxWidth: '800px',
-          width: '90%',
+          width: '50%',
         }}>
           <h2 id="screenshot-modal-title" className="mb-4">Screenshot for {selectedUser?.firstname}</h2>
           {selectedUser && selectedUser.ticketInfo?.screenshot_Url && (
@@ -152,17 +210,25 @@ export default function DataPage() {
             </div>
           )}
           <div className="flex items-center mb-4">
-            <input type="checkbox" id="approve" />
+            <input 
+            type="checkbox"
+            id="approve"
+            checked={isApproved}
+            onChange={handleCheckboxChange}
+             />
             <label htmlFor="approve" className="ml-2">Approve the user *</label>
           </div>
+           {/* Only show the submit button if the checkbox is checked */}
+        {isApproved && (
           <Button
             onClick={handleSubmitApproval}
             color="primary"
             variant="contained"
-            style={{ marginRight: "8px" }}
+            style={{ marginRight: '8px' }}
           >
             Submit
           </Button>
+        )}
           <Button onClick={handleCloseModal} color="secondary">Close</Button>
         </div>
       </Modal>
