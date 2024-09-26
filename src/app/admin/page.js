@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link"; // Corrected import statement
-
+import LogPage from "../component/LogPage";
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -11,7 +11,12 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-blue-600">
+    <>
+   {true? 
+   
+   <LogPage/>
+   
+   :<nav className="bg-blue-600">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
@@ -77,6 +82,7 @@ export default function Navbar() {
           </div>
         </div>
       )}
-    </nav>
+    </nav>}
+    </>
   );
 }
