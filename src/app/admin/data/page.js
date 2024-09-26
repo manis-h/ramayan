@@ -1,30 +1,48 @@
 "use client"; // This must be the first line in the file
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { DataGrid } from "@mui/x-data-grid";
 import { Modal, Button } from "@mui/material";
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import axios from 'axios';
+
 
 export default function DataPage() {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedScreenshot, setSelectedScreenshot] = useState(null);
-  const [verifiedUsers, setVerifiedUsers] = useState({});
-  const [approveUserId, setApproveUserId] = useState(null); // Track which user is being approved
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [users, setUsers] = useState([]); // State to hold the list of users
   const [approvedStatus, setApprovedStatus] = useState({}); // Track approval status
+
+  // Fetch users from the API on component mount
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/api/getusers');
+        // const data = await response.json();
+        const data = response;
+        console.log("The response data is ",data.data.userinfo);
+        setUsers(data); // Assuming the API returns an array of user objects
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  // Sample data for the Data Grid
   const columns = [
     { field: "id", headerName: "ID", width: 90 },
-    { field: "firstName", headerName: "First name", width: 150 },
-    { field: "lastName", headerName: "Last name", width: 150 },
-    { field: "age", headerName: "Age", type: "number", width: 110 },
-    { field: "email", headerName: "Email", width: 200 },
+    { field: "firstname", headerName: "First Name", width: 150 },
+    { field: "lastname", headerName: "Last Name", width: 150 },
+    { field: "emailadress", headerName: "Email", width: 200 },
+    { field: "address", headerName: "Address", width: 200 },
+    { field: "pnno", headerName: "Phone Number", width: 150 },
     {
       field: "screenshots",
       headerName: "Screenshots",
@@ -32,9 +50,9 @@ export default function DataPage() {
       renderCell: (params) => (
         <Button
           variant="outlined"
-          onClick={() => handleOpenModal(params.row.id, params.value)}
+          onClick={() => handleOpenModal(params.row)}
         >
-          View Screenshots
+          View Screenshot
         </Button>
       ),
     },
@@ -44,43 +62,40 @@ export default function DataPage() {
       width: 200,
       renderCell: (params) => (
         <>
-          {approvedStatus[params.row.id] ? (
-            <CheckBoxIcon
-              style={{ color: "green", cursor: "pointer" }}
-            />
+          {approvedStatus[params.row._id] ? (
+            <CheckBoxIcon style={{ color: "green", cursor: "pointer" }} />
           ) : (
-            <CancelIcon
-              style={{ color: "red", cursor: "pointer" }}
-            />
+            <CancelIcon style={{ color: "red", cursor: "pointer" }} />
           )}
         </>
       ),
     },
   ];
 
-  const rows = [
-    { id: 1, lastName: "Snow", firstName: "Jon", age: 35, email: "jon.snow@example.com", screenshots: "https://ramleela.s3.ap-south-1.amazonaws.com/ramleelascreenshots/1727263833492" },
-    { id: 2, lastName: "Lannister", firstName: "Cersei", age: 42, email: "cersei.lannister@example.com", screenshots: "screenshot2.png" },
-    // Add more rows as needed
-  ];
+  // Prepare rows for DataGrid
+  const rows = Array.isArray(users) ? users.map((user, index) => ({
+    id: index + 1, // Or you can use user._id for unique identification
+    ...user,
+})) : [];
 
-  const handleOpenModal = (id, screenshot) => {
-    setApproveUserId(id); // Set the ID of the user to approve
-    setSelectedScreenshot(screenshot);
+
+  const handleOpenModal = (user) => {
+    setSelectedUser(user); // Set the selected user for approval
     setIsOpen(true); // Open the modal
   };
 
   const handleCloseModal = () => {
-    setSelectedScreenshot(null);
+    setSelectedUser(null);
     setIsOpen(false);
   };
 
   const handleSubmitApproval = () => {
-    // Update the approval status for the user
-    setApprovedStatus((prev) => ({
-      ...prev,
-      [approveUserId]: true, // Mark as approved
-    }));
+    if (selectedUser) {
+      setApprovedStatus((prev) => ({
+        ...prev,
+        [selectedUser._id]: true, // Mark as approved
+      }));
+    }
     handleCloseModal(); // Close the modal
   };
 
@@ -150,7 +165,7 @@ export default function DataPage() {
 
       {/* Modal for Screenshots */}
       <Modal
-        open={Boolean(selectedScreenshot)}
+        open={Boolean(selectedUser)}
         onClose={handleCloseModal}
         aria-labelledby="screenshot-modal-title"
         aria-describedby="screenshot-modal-description"
@@ -166,9 +181,9 @@ export default function DataPage() {
           maxWidth: '800px',
           width: '90%',
         }}>
-          <h2 id="screenshot-modal-title" className="mb-4">Screenshot</h2>
-          {selectedScreenshot && (
-            <img src={selectedScreenshot} alt="Screenshot" style={{ width: "100%", marginBottom: "16px" }} />
+          <h2 id="screenshot-modal-title" className="mb-4">Screenshot for {selectedUser?.firstname}</h2>
+          {selectedUser && selectedUser.ticketInfo.screenshot_Url && (
+            <img src={selectedUser.ticketInfo.screenshot_Url} alt="Screenshot" style={{ width: "100%", marginBottom: "16px" }} />
           )}
           <div className="flex items-center mb-4">
             <input type="checkbox" id="approve" />
