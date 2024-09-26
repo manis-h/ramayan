@@ -1,6 +1,8 @@
+// api/uploadScreenshot.js
 import aws from 'aws-sdk';
 import multer from 'multer';
 import Ticket from '@/models/TicketInfo';
+import dbConnect from "@/lib/database";
 
 // Initialize AWS S3
 const s3 = new aws.S3({
@@ -11,7 +13,7 @@ const s3 = new aws.S3({
 
 // Configure multer for handling multipart form data
 const storage = multer.memoryStorage();
-const upload = multer({ storage }).single('screenshot'); // Single file field 'screenshot'
+const upload = multer({ storage }).single('screenshot');
 
 // Helper function to upload a file to S3
 const uploadFileToS3 = async (file) => {
@@ -47,28 +49,47 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Error parsing form data' });
       }
 
+      const { userId , utr } = req.query; // Extract user ID from the query params
+      console.log( "The user id is ",userId , "The utr is ",utr)
+      if (!userId && !utr) {
+        return res.status(400).json({ error: 'Missing user ID or utr  in query params' });
+      }
+
       const file = req.file; // Access the uploaded file
       if (!file) {
         return res.status(400).json({ error: 'No file uploaded' });
       }
 
       try {
+        // Connect to DB
+        await dbConnect();
+
+        // Check if the user exists
+        const user = await Ticket.findById(userId);
+        if (!user) {
+          return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Ensure ticketInfo exists
+        if (!user.ticketInfo) {
+          user.ticketInfo = {}; // Initialize ticketInfo if it's undefined
+        }
+
         // Upload the file to S3
         const screenshotUrl = await uploadFileToS3(file);
-        console.log('Screenshot URL:', screenshotUrl);
 
-        // Save the ticket with only screenshot URL in the database
-        const createdTicket = new Ticket({
-          ticketInfo: { "screenshot_Url": screenshotUrl },
-        });
+        // Update the user's record with the screenshot URL
+        user.ticketInfo.screenshot_Url = screenshotUrl;
+        user.ticketInfo.utrno = utr;
 
-        await createdTicket.save(); // Save ticket to MongoDB
-        console.log('Ticket saved:', createdTicket);
+        // Save the updated user document
+        await user.save();
 
         return res.status(200).json({
           success: true,
+          message: "Screenshot uploaded and associated with user",
           screenshotUrl,
-          ticketInfo: createdTicket,
+          user,
         });
       } catch (error) {
         return res.status(500).json({ error: `Error processing request: ${error.message}` });
@@ -78,3 +99,4 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 }
+
