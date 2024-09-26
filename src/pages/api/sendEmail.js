@@ -5,7 +5,7 @@ import { validateEmail, checkDomain } from '@/utils/validateEmail'; // Ensure bo
 
 export default async function handler(req, res) {
   if (req.method === 'POST') {
-    const { email } = req.body;
+    const { email , name } = req.body;
 
     // Validate the email and check its domain
     // const isValidEmail = validateEmail(email);
@@ -33,13 +33,13 @@ export default async function handler(req, res) {
     });
 
     const htmlToSend = `
-      <p>We are grateful to acknowledge the generous contribution of ₹[Insert Amount] from [Donor's Name] towards the Luv Kusha Ramayan initiative. Your support will help us in preserving and promoting the rich cultural heritage and teachings of the Ramayan.</p>
+      <p>We are grateful to acknowledge the generous contribution of ₹100 from ₹${name}  towards the Luv Kusha Ramayan initiative. Your support will help us in preserving and promoting the rich cultural heritage and teachings of the Ramayan.</p>
       <p>This donation will go a long way in furthering our cause, and we sincerely appreciate your commitment to our mission. May Lord Ram bless you with peace, prosperity, and happiness.</p>
       <h3>Donation Details:</h3>
       <p>Donor’s Name: [Insert Donor's Name]</p>
-      <p>Amount Donated: ₹[Insert Amount]</p>
+      <p>Amount Donated: ₹$100</p>
       <p>Mode of Payment: Online Transfer</p>
-      <p>Donation Reference Number: [Insert Transaction ID or Reference]</p>
+      <p>Donation Reference Number: {${ utrno}}</p>
       <p>Thank you once again for your kind support.</p>
       <p>Warm regards,<br>[Organization/Committee Name]<br>Luv Kusha Ramayan Committee</p>
     `;

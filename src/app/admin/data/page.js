@@ -83,7 +83,7 @@ export default function DataPage() {
     pnno: user.user.Mobile,
     ticketInfo: user.ticketInfo, // Add this to 
     // access ticket info in the modal
-    verifyUser : user.ticketInfo.status
+    verifyUser : user?.ticketInfo?.status||false
   })) : [];
 
   const handleOpenModal = (user) => {
