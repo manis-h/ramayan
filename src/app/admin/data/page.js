@@ -9,6 +9,7 @@ import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import axios from 'axios';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import Swal from "sweetalert2";  // Import SweetAlert2
+import { showSpinner , hideSpinner } from "@/lib/spinner";
 
 export default function DataPage() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,18 +19,26 @@ export default function DataPage() {
   const [isApproved, setIsApproved] = useState(false); // Track approval status
 
   // Fetch the users
+  const [amount, setAmount] = useState(''); // State for amount
   const fetchUsers = async () => {
+    showSpinner()
     try {
       const response = await axios.get('/api/getusers');
       setUsers(response.data.userinfo);
     } catch (error) {
       console.error('Error fetching users:', error);
+    } finally {
+      hideSpinner()
     }
   };
 
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const handleAmountChange = (event) => {
+    setAmount(event.target.value); // Update the amount state
+};
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -68,32 +77,15 @@ export default function DataPage() {
         }
       }
     });
-
-
-
-    // console.log("The row is", row);
-    // try {
-    //   // Await the deletion request
-    //   const res = await axios.post("/api/disableUser", {
-    //     id: row._id,
-    //   });
-    //   console.log("User deleted successfully:", res);
-  
-    //   // Refresh the user list after successful deletion
-    //   await fetchUsers();
-    // } catch (error) {
-    //   console.error("Unable to delete this user:", error);
-    // }
   };
 
-  // const message = `We are grateful to acknowledge the generous contribution of ₹100 from ${row.firstname} ${row.lastname} towards the Luv Kusha Ramayan initiative. Your support will help us in preserving and promoting the rich cultural heritage and teachings of the Ramayan.\n\nThis donation will go a long way in furthering our cause, and we sincerely appreciate your commitment to our mission. May Lord Ram bless you with peace, prosperity, and happiness.\n\nDonation Details:\nDonor’s Name: ${row.firstname} ${row.lastname}\n\nAmount Donated: ₹100\n\nMode of Payment: Online Transfer\n\nDonation Reference Number: 237859238957322\n\nThank you once again for your kind support.\n\nWarm regards,\nLuv Kusha Ramayan Committee`; // Customize message
 
 
   // Function to handle WhatsApp navigation
   const navigateWhatsapp = (row) => {
     console.log(row)
     const phoneNumber = row.pnno || ''; // Ensure phone number exists
-    const message = `We are grateful to acknowledge the generous contribution of ₹100 from ${row.firstname} ${row.lastname} towards the Luv Kusha Ramayan initiative. Your support will help us in preserving and promoting the rich cultural heritage and teachings of the Ramayan.\n\nThis donation will go a long way in furthering our cause, and we sincerely appreciate your commitment to our mission. May Lord Ram bless you with peace, prosperity, and happiness.\n\nDonation Details:\nDonor’s Name: ${row.firstname} ${row.lastname}\n\nAmount Donated: ₹100\n\nMode of Payment: Online Transfer\n\nDonation Reference Number: 237859238957322\n\nThank you once again for your kind support.\n\nWarm regards,\nLuv Kusha Ramayan Committee`; // Customize message
+    const message = `We are grateful to acknowledge the generous contribution of ${row.ticketInfo.amount} from ${row.firstname} ${row.lastname} towards the Luv Kusha Ramayan initiative. Your support will help us in preserving and promoting the rich cultural heritage and teachings of the Ramayan.\n\nThis donation will go a long way in furthering our cause, and we sincerely appreciate your commitment to our mission. May Lord Ram bless you with peace, prosperity, and happiness.\n\nDonation Details:\nDonor’s Name: ${row.firstname} ${row.lastname}\n\nAmount Donated: ${row.ticketInfo.amount}\n\nMode of Payment: Online Transfer\n\nDonation Reference Number: 237859238957322\n\nThank you once again for your kind support.\n\nWarm regards,\nLuv Kusha Ramayan Committee`; // Customize message
 
     const encodedMessage = encodeURIComponent(message); // URL encoding the message
     const whatsappLink = `https://wa.me/+91${phoneNumber}/?text=${encodedMessage}`; // Construct WhatsApp link
@@ -101,7 +93,7 @@ export default function DataPage() {
     console.log("The message is ",message)
 
     // Navigate to the WhatsApp link
-    window.open(whatsappLink, "_blank");
+    // window.open(whatsappLink, "_blank");
   };
 
   const columns = [
@@ -141,12 +133,15 @@ export default function DataPage() {
       headerName: "WhatsApp User",
       width: 200,
       renderCell: (params) => (
-        <WhatsAppIcon
-          onClick={() => navigateWhatsapp(params.row)}
-          style={{ color: '#25D366', fontSize: '24px', cursor: 'pointer' }}
-          onMouseEnter={(e) => (e.target.style.transform = 'scale(1.2)')} // Zoom effect on hover
-          onMouseLeave={(e) => (e.target.style.transform = 'scale(1)')}
-        />
+        params.row.ticketInfo?.amount > 0 ? ( // Check if amount is greater than 0
+          <WhatsAppIcon
+            onClick={() => navigateWhatsapp(params.row)}
+            style={{ color: '#25D366', fontSize: '24px', cursor: 'pointer' }}
+            onMouseEnter={(e) => (e.target.style.transform = 'scale(1.2)')} // Zoom effect on hover
+            onMouseLeave={(e) => (e.target.style.transform = 'scale(1)')}
+          />
+        ) : null // Render nothing if amount is 0 or undefined
+      
       ),
     },
     {
@@ -195,24 +190,26 @@ export default function DataPage() {
   const handleSubmitApproval = async () => {
     if (selectedUser) {
       try {
+        showSpinner()
+        handleCloseModal(); // Close modal after submission
         const response = await axios.post('/api/setStatus', {
           id: selectedUser._id,
           approved: true,
+          amountreceived : amount
         });
-
         console.log("API Response:", response.data);
-
         // Update approved status in local state
         setApprovedStatus((prev) => ({
           ...prev,
           [selectedUser._id]: true,
         }));
-
-        handleCloseModal(); // Close modal after submission
-
+        
         await fetchUsers(); // Refresh users
       } catch (error) {
         console.error("Error submitting approval:", error);
+      }finally{
+        setAmount('');
+        hideSpinner()
       }
     }
   };
@@ -283,6 +280,25 @@ export default function DataPage() {
               <strong>UTR Number:</strong> {selectedUser.ticketInfo.utrno}
             </div>
           )}
+          <div className="mb-4">
+                    <label htmlFor="amount" className="mr-2">
+                        Amount:
+                    </label>
+                    <input
+                        type="string"
+                        id="amount"
+                        value={amount}
+                        onChange={handleAmountChange}
+                        placeholder="Enter amount"
+                        style={{
+                            padding: '8px',
+                            borderRadius: '4px',
+                            border: '1px solid #ccc',
+                            width: '100%', // Full width for responsive design
+                            maxWidth: '200px', // Optional max width
+                        }}
+                    />
+                </div>
           <div className="flex items-center mb-4">
             <input
               type="checkbox"
@@ -309,6 +325,8 @@ export default function DataPage() {
           </Button>
         </div>
       </Modal>
+
+
     </div>
   );
 }
