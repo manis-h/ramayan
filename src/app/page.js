@@ -36,6 +36,14 @@ export default function Home() {
       });
     } finally {
       hideSpinner(); // Hide the spinner after the request
+      
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Thank you for the Payment ",
+        showConfirmButton: false,
+        timer: 1500
+      });
     }
   };
 
@@ -64,6 +72,8 @@ export default function Home() {
       });
     } finally {
       hideSpinner(); // Hide the spinner after the request
+
+
     }
   };
 
