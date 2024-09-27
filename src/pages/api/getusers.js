@@ -6,7 +6,7 @@ export default async function getAllUsers(req, res) {
     await dbConnect(); // Added "await"
     console.log("DB connected successfully");
     if (req.method === 'GET') { // Corrected 'Get' to 'GET'
-      const ticketDetails = await Ticket.find();
+      const ticketDetails = await Ticket.find({ disabled : false });
       if (!ticketDetails) {
         return res.status(401).json({
           success: false,
