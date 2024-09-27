@@ -1,3 +1,4 @@
+'use client'
 import React, { useEffect, useState } from 'react';
 import { Backdrop, CircularProgress } from '@mui/material'; // Material-UI components
 

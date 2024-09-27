@@ -83,17 +83,17 @@ export default function DataPage() {
 
   // Function to handle WhatsApp navigation
   const navigateWhatsapp = (row) => {
-    console.log(row)
+    // console.log(row)
     const phoneNumber = row.pnno || ''; // Ensure phone number exists
     const message = `We are grateful to acknowledge the generous contribution of ${row.ticketInfo.amount} from ${row.firstname} ${row.lastname} towards the Luv Kusha Ramayan initiative. Your support will help us in preserving and promoting the rich cultural heritage and teachings of the Ramayan.\n\nThis donation will go a long way in furthering our cause, and we sincerely appreciate your commitment to our mission. May Lord Ram bless you with peace, prosperity, and happiness.\n\nDonation Details:\nDonor’s Name: ${row.firstname} ${row.lastname}\n\nAmount Donated: ${row.ticketInfo.amount}\n\nMode of Payment: Online Transfer\n\nDonation Reference Number: 237859238957322\n\nThank you once again for your kind support.\n\nWarm regards,\nLuv Kusha Ramayan Committee`; // Customize message
 
     const encodedMessage = encodeURIComponent(message); // URL encoding the message
     const whatsappLink = `https://wa.me/+91${phoneNumber}/?text=${encodedMessage}`; // Construct WhatsApp link
 
-    console.log("The message is ",message)
+    // console.log("The message is ",message)
 
     // Navigate to the WhatsApp link
-    // window.open(whatsappLink, "_blank");
+    window.open(whatsappLink, "_blank");
   };
 
   const columns = [
@@ -204,12 +204,33 @@ export default function DataPage() {
           [selectedUser._id]: true,
         }));
         
+        
+
         await fetchUsers(); // Refresh users
       } catch (error) {
         console.error("Error submitting approval:", error);
       }finally{
         setAmount('');
-        hideSpinner()
+        hideSpinner();
+         // Show SweetAlert2 toast on success
+         Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Email sent sucessfull",
+          showConfirmButton: false,
+          timer: 1500
+        });
+         // Show SweetAlert2 toast on success
+      // Swal.fire({
+      //   icon: 'success',
+      //   title: 'Mail sent successfully',
+      //   toast: true,
+      //   position: 'top-end',
+      //   showConfirmButton: false,
+      //   timer: 3000, // The toast will disappear after 3 seconds
+      //   timerProgressBar: true,
+      // });
+
       }
     }
   };
