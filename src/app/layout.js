@@ -14,8 +14,7 @@ const geistMono = localFont({
 
 export const metadata = {
   title: "Shree Dharmic Ramleela",
-  description: "Shree Dharmic Ramleela Since 1923 
-Prade Ground",
+  description: "Shree Dharmic Ramleela Since 1923 Prade Ground",
 };
 
 export default function RootLayout({ children }) {
