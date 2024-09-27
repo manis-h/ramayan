@@ -9,8 +9,9 @@ const TicketSchema = new mongoose.Schema({
         screenshot_Url: String,
         utrno: String,
         status: {
-            require: true,
-            type: Boolean
+            required: true,
+            type: Boolean,
+            default : false
         }
     },
     // Add a disabled field
