@@ -86,13 +86,19 @@ export default function DataPage() {
     // }
   };
 
+  // const message = `We are grateful to acknowledge the generous contribution of ₹100 from ${row.firstname} ${row.lastname} towards the Luv Kusha Ramayan initiative. Your support will help us in preserving and promoting the rich cultural heritage and teachings of the Ramayan.\n\nThis donation will go a long way in furthering our cause, and we sincerely appreciate your commitment to our mission. May Lord Ram bless you with peace, prosperity, and happiness.\n\nDonation Details:\nDonor’s Name: ${row.firstname} ${row.lastname}\n\nAmount Donated: ₹100\n\nMode of Payment: Online Transfer\n\nDonation Reference Number: 237859238957322\n\nThank you once again for your kind support.\n\nWarm regards,\nLuv Kusha Ramayan Committee`; // Customize message
+
 
   // Function to handle WhatsApp navigation
   const navigateWhatsapp = (row) => {
+    console.log(row)
     const phoneNumber = row.pnno || ''; // Ensure phone number exists
-    const message = `Hello, ${row.firstname} ${row.lastname}!`; // Customize message
+    const message = `We are grateful to acknowledge the generous contribution of ₹100 from ${row.firstname} ${row.lastname} towards the Luv Kusha Ramayan initiative. Your support will help us in preserving and promoting the rich cultural heritage and teachings of the Ramayan.\n\nThis donation will go a long way in furthering our cause, and we sincerely appreciate your commitment to our mission. May Lord Ram bless you with peace, prosperity, and happiness.\n\nDonation Details:\nDonor’s Name: ${row.firstname} ${row.lastname}\n\nAmount Donated: ₹100\n\nMode of Payment: Online Transfer\n\nDonation Reference Number: 237859238957322\n\nThank you once again for your kind support.\n\nWarm regards,\nLuv Kusha Ramayan Committee`; // Customize message
+
     const encodedMessage = encodeURIComponent(message); // URL encoding the message
     const whatsappLink = `https://wa.me/+91${phoneNumber}/?text=${encodedMessage}`; // Construct WhatsApp link
+
+    console.log("The message is ",message)
 
     // Navigate to the WhatsApp link
     window.open(whatsappLink, "_blank");
@@ -243,14 +249,16 @@ export default function DataPage() {
           className="modal-content flex flex-col items-center justify-center p-4"
           style={{
             position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            background: 'white',
-            borderRadius: '8px',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-            maxWidth: '800px',
-            width: '50%',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      background: 'white',
+      borderRadius: '8px',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+      maxWidth: '90%',  // Responsive width
+      width: '100%',  // Full width for small screens
+      maxHeight: '90vh',  // Prevent the modal from exceeding the viewport height
+      overflowY: 'auto',  // Enable scrolling if content is too large
           }}
         >
           <h2 id="screenshot-modal-title" className="mb-4">
@@ -260,7 +268,14 @@ export default function DataPage() {
             <img
               src={selectedUser.ticketInfo.screenshot_Url}
               alt="Screenshot"
-              style={{ width: "100%", marginBottom: "16px" }}
+              style={{
+                width: "100%",  // Image takes full width of the modal
+                maxWidth: '100%',  // Make sure it doesn’t exceed container width
+                maxHeight: '70vh',  // Prevent the image from exceeding 70% of the viewport height
+                height: "auto",  // Maintain aspect ratio
+                objectFit: "contain",  // Keep the image contained within its container
+                marginBottom: "16px",
+              }}
             />
           )}
           {selectedUser?.ticketInfo?.utrno && (

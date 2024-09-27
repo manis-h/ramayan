@@ -42,7 +42,7 @@ export default function Home() {
   return (
     <div className="mx-auto vh-100 h-full my-auto content-center bg-ram">
       <h1 className="max-w-md mx-auto font-extrabold text-5xl text-center p-2 text-amber-800">
-        लव कुश रामायण
+        Shree Dharmic Ramleela Since 1923 Prade Ground
       </h1>
       {!pay ? (
         <form
