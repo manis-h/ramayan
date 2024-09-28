@@ -3,6 +3,8 @@ import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
+// import { showSpinner , hideSpinner } from "./component/ModalSpinner";
+import { showSpinner , hideSpinner } from "@/lib/spinner";
 // import Er from ''
 export default function Home() {
   const [form, setForm] = useState({});
@@ -10,35 +12,72 @@ export default function Home() {
   const [ss, setSS] = useState({});
   const sendPhoto = async (e) => {
     e.preventDefault();
-    
+
     const formData = new FormData();
-    
-    formData.append('screenshot',ss?.photo)
-    const data = await axios.post(`/api/uploads?userId=${ss?.id}&utr=${ss?.utr}`,formData);
-    if (data?.data?.success) {
+    formData.append('screenshot', ss?.photo);
+
+    // Show spinner before making the API call
+    showSpinner();
+
+    try {
+      const data = await axios.post(`/api/uploads?userId=${ss?.id}&utr=${ss?.utr}`, formData);
+      if (data?.data?.success) {
+        Swal.fire({
+          icon: 'success',
+          text: 'Form Submitted Successfully'
+        });
+        setPay(false);
+      }
+    } catch (error) {
+      console.error(error);
       Swal.fire({
-        success:true,
-        icon:'success',
-        text:'Form Submitted Successfully'
-      })
-      setPay(false)
+        icon: 'error',
+        text: 'An error occurred while submitting the form.'
+      });
+    } finally {
+      hideSpinner(); // Hide the spinner after the request
+      
+      Swal.fire({
+        position: "top-end",
+        icon: "success",
+        title: "Thank you for the Payment ",
+        showConfirmButton: false,
+        timer: 1500
+      });
     }
   };
+
   const submitForm = async (e) => {
-    const formData = new FormData();
-    // formData.append('user',form)
-
-    formData.append('screenshot',ss)
-
     e.preventDefault();
-    const data = await axios.post("/api/postticketinfo", { user: form });
-    if (data?.data?.success) {
-      setPay(true);
-      setSS({...ss,id:data?.data?.data?._id})
+
+    const formData = new FormData();
+    formData.append('screenshot', ss);
+
+    // Show spinner before making the API call
+    showSpinner();
+
+    try {
+      const data = await axios.post("/api/postticketinfo", { user: form });
+      if (data?.data?.success) {
+        setPay(true);
+        setSS({ ...ss, id: data?.data?.data?._id });
+      }
+      console.log({ data });
+      console.log(data?.data?.data?._id);
+    } catch (error) {
+      console.error(error);
+      Swal.fire({
+        icon: 'error',
+        text: 'An error occurred while submitting the form.'
+      });
+    } finally {
+      hideSpinner(); // Hide the spinner after the request
+
+
     }
-    console.log({ data });
-    console.log(data?.data?.data?._id);
   };
+
+
   return (
     <div className="mx-auto vh-100 h-full my-auto content-center bg-ram">
       <h1 className="max-w-md mx-auto font-extrabold text-5xl text-center p-2 text-amber-800">
@@ -131,7 +170,7 @@ export default function Home() {
               name="floating_phone"
               id="floating_phone"
               class="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder="+91 "
+              placeholder=" "
               required
               // value={form?.Mobile || ""}
               onChange={(e) => setForm({ ...form, Mobile: e.target.value })}
