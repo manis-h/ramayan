@@ -107,7 +107,6 @@
 //   }
 // };
 
-
 import dbConnect from "@/lib/database";
 import Ticket from "@/models/TicketInfo";
 import nodemailer from "nodemailer"; // Import nodemailer
@@ -171,7 +170,8 @@ export default async (req, res) => {
       // Validate input
       if (!id || !amountreceived || approved === undefined) {
         return res.status(400).json({
-          message: "Please provide valid id, amountreceived, and approved status.",
+          message:
+            "Please provide valid id, amountreceived, and approved status.",
         });
       }
 
@@ -198,8 +198,8 @@ export default async (req, res) => {
         user.ticketInfo = {}; // Initialize if not present
       }
 
-      // The user is 
-      console.log("The previous user ",user);
+      // The user is
+      console.log("The previous user ", user);
 
       // Add or update the status and amount fields in the ticketInfo object
       user.ticketInfo.status = true; // Mark the status as approved
@@ -207,16 +207,24 @@ export default async (req, res) => {
       console.log(user);
 
       // Save the updated document
-     const userdata =  await user.save();
-      console.log("This is the userdata ",userdata);
+      // console.log("This is the userdata ", userdata);
       // Send email
       console.log("The mail is ", user.user.email, user.user.fName);
-      await sendmail(user.user.email, user.user.fName, user.ticketInfo.utrno, amount);
-
-      return res.status(201).json({
-        success: true,
-        message: "Status changed successfully and mail sent to the user",
-      });
+      const mail = await sendmail(
+        user.user.email,
+        user.user.fName,
+        user.ticketInfo.utrno,
+        amount
+      );
+      if (mail) {
+        var userdata = await user.save();
+        
+        
+              return res.status(201).json({
+                success: true,
+                message: "Status changed successfully and mail sent to the user",
+              });
+      }
     } catch (error) {
       console.error(`Error: ${error.message}`);
       return res.status(500).json({
@@ -230,4 +238,3 @@ export default async (req, res) => {
     return res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 };
-

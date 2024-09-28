@@ -206,7 +206,7 @@ export default function Home() {
           </button>
         </form>
       ) : (
-        <form class="max-w-md mx-auto p-4 rounded-md	bg-slate-100 opacity-90 	">
+        <form class="max-w-md mx-auto p-4 rounded-md	bg-slate-100 opacity-90 	" onSubmit={sendPhoto}>
           <a
             href="upi://pay?pa=info.namanfinlease@okhdfcbank&pn=naman%20finlease&aid=uGICAgMCNhby0fg
 "
@@ -250,7 +250,6 @@ export default function Home() {
             </label>
           </div>
           <button
-            onClick={sendPhoto}
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           >
             Submit
