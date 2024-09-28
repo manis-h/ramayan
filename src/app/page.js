@@ -10,31 +10,34 @@ export default function Home() {
   const [ss, setSS] = useState({});
   const sendPhoto = async (e) => {
     e.preventDefault();
-    
+
     const formData = new FormData();
-    
-    formData.append('screenshot',ss?.photo)
-    const data = await axios.post(`/api/uploads?userId=${ss?.id}&utr=${ss?.utr}`,formData);
+
+    formData.append("screenshot", ss?.photo);
+    const data = await axios.post(
+      `/api/uploads?userId=${ss?.id}&utr=${ss?.utr}`,
+      formData
+    );
     if (data?.data?.success) {
       Swal.fire({
-        success:true,
-        icon:'success',
-        text:'Form Submitted Successfully'
-      })
-      setPay(false)
+        success: true,
+        icon: "success",
+        text: "Form Submitted Successfully",
+      });
+      setPay(false);
     }
   };
   const submitForm = async (e) => {
     const formData = new FormData();
     // formData.append('user',form)
 
-    formData.append('screenshot',ss)
+    formData.append("screenshot", ss);
 
     e.preventDefault();
     const data = await axios.post("/api/postticketinfo", { user: form });
     if (data?.data?.success) {
       setPay(true);
-      setSS({...ss,id:data?.data?.data?._id})
+      setSS({ ...ss, id: data?.data?.data?._id });
     }
     console.log({ data });
     console.log(data?.data?.data?._id);
@@ -168,7 +171,12 @@ export default function Home() {
         </form>
       ) : (
         <form class="max-w-md mx-auto p-4 rounded-md	bg-slate-100 opacity-90 	">
-          <img src="./QR.jpg" className="w-100" />
+          <a
+            href="upi://pay?pa=info.namanfinlease@okhdfcbank&pn=naman%20finlease&aid=uGICAgMCNhby0fg
+"
+          >
+            <img src="./QR.jpg" className="w-100" />
+          </a>
           <div class="relative z-0 w-full mb-5 group">
             <input
               type="file"
@@ -178,7 +186,7 @@ export default function Home() {
               placeholder=" "
               required
               // value={form?.email || ""}
-              onChange={(e) => setSS({...ss,photo:e.target.files[0]})}
+              onChange={(e) => setSS({ ...ss, photo: e.target.files[0] })}
             />
             <label
               for="floating_email"
